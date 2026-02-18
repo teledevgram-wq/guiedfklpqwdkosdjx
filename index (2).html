@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emerald Mods</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #0a0c0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #0f150f;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a3a2a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #4caf7a;
+            cursor: pointer;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: #a0a0a0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 0.25rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: #4caf7a;
+            border-bottom-color: #4caf7a;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border: 1px solid #2a3a2a;
+            background: transparent;
+            color: #e0e0e0;
+        }
+
+        .btn:hover {
+            border-color: #4caf7a;
+            color: #4caf7a;
+        }
+
+        .btn-emerald {
+            background: #4caf7a;
+            color: #0a0c0a;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .admin-panel {
+            display: none;
+            margin: 2rem;
+            padding: 1.5rem;
+            background: #111611;
+            border: 1px solid #c9a03d;
+            border-radius: 8px;
+        }
+
+        .admin-panel.visible {
+            display: block;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-box {
+            background: #1a241a;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            color: #4caf7a;
+        }
+
+        .pending-item {
+            background: #1a241a;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            border-left: 3px solid #4caf7a;
+        }
+
+        .pending-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .pending-title {
+            font-weight: 500;
+            color: #4caf7a;
+        }
+
+        .pending-media {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .pending-media img, .pending-media video {
+            width: 100%;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .pending-files {
+            margin: 0.5rem 0;
+        }
+
+        .pending-file {
+            background: #0f150f;
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.2rem;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .pending-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+
+        .admin-btn {
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            background: #4caf7a;
+            color: #0a0c0a;
+        }
+
+        .admin-btn-danger {
+            background: #af4c4c;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .hero {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #111611;
+            border: 1px solid #2a3a2a;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #4caf7a;
+            margin-bottom: 0.5rem;
+        }
+
+        .filters {
+            margin: 2rem 0;
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.4rem 1rem;
+            background: #1a241a;
+            border: 1px solid #2a3a2a;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        .filter-btn.active {
+            background: #4caf7a;
+            border-color: #4caf7a;
+            color: #0a0c0a;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .item-card {
+            background: #111611;
+            border: 1px solid #2a3a2a;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .item-card:hover {
+            border-color: #4caf7a;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 130px;
+            background: #1a241a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-title {
+            font-weight: 500;
+            color: #4caf7a;
+        }
+
+        .card-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-type {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            background: #1a241a;
+            border-radius: 3px;
+            color: #4caf7a;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: #a0a0a0;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            background: #1a241a;
+            border-radius: 3px;
+            color: #888;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+            padding-top: 0.5rem;
+            border-top: 1px solid #2a3a2a;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.3rem;
+            background: #1a241a;
+            border: 1px solid #2a3a2a;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #b0b0b0;
+            font-size: 0.8rem;
+        }
+
+        .action-btn:hover {
+            border-color: #4caf7a;
+            color: #4caf7a;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #111611;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #4caf7a;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: #4caf7a;
+            font-weight: 400;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            background: #1a241a;
+            border: 1px solid #2a3a2a;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.3rem;
+        }
+
+        .chip {
+            padding: 0.3rem 0.8rem;
+            background: #1a241a;
+            border: 1px solid #2a3a2a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .chip.selected {
+            background: #4caf7a;
+            border-color: #4caf7a;
+            color: #0a0c0a;
+        }
+
+        .media-upload-area {
+            border: 1px dashed #4caf7a;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .media-preview {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .media-item {
+            position: relative;
+            aspect-ratio: 1;
+        }
+
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .remove-media {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #af4c4c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .file-item {
+            background: #1a241a;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr auto;
+            gap: 0.3rem;
+        }
+
+        .file-row select, .file-row input {
+            padding: 0.3rem;
+            background: #0f150f;
+            border: 1px solid #2a3a2a;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .remove-file {
+            background: #af4c4c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.3rem;
+            cursor: pointer;
+        }
+
+        .add-file-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: transparent;
+            border: 1px dashed #4caf7a;
+            color: #4caf7a;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 0.5rem 1rem;
+            background: #4caf7a;
+            color: #0a0c0a;
+            border-radius: 4px;
+            z-index: 2000;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #2a3a2a;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo" onclick="showMainPage()">EMERALD MODS</div>
+        <nav class="nav">
+            <a onclick="setCategory('all')" class="active">Все</a>
+            <a onclick="setCategory('mod')">Моды</a>
+            <a onclick="setCategory('resourcepack')">Ресурспаки</a>
+            <a onclick="setCategory('map')">Карты</a>
+        </nav>
+        <div class="user-info" id="userInfo">
+            <span class="username" id="username"></span>
+            <button class="btn" id="authBtn" onclick="openAuthModal()">Войти</button>
+        </div>
+    </header>
+
+    <div id="adminPanel" class="admin-panel">
+        <div style="display:flex;justify-content:space-between;margin-bottom:1rem;">
+            <h3 style="color:#c9a03d;">Панель управления</h3>
+            <button class="btn" onclick="logout()">Выйти</button>
+        </div>
+        <div class="admin-stats" id="adminStats"></div>
+        <div id="pendingList"></div>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Моды, ресурспаки и карты для Minecraft</h1>
+            <p style="color:#888;">Загружай свои работы | Множество версий | Любые загрузчики</p>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <div class="filter-label">Категория</div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="setCategory('all')">Все</button>
+                    <button class="filter-btn" onclick="setCategory('mod')">Моды</button>
+                    <button class="filter-btn" onclick="setCategory('resourcepack')">Ресурспаки</button>
+                    <button class="filter-btn" onclick="setCategory('map')">Карты</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <div class="filter-label">Тип</div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="setType('all')">Все</button>
+                    <button class="filter-btn" onclick="setType('optimization')">Оптимизация</button>
+                    <button class="filter-btn" onclick="setType('pvp')">PvP</button>
+                    <button class="filter-btn" onclick="setType('decoration')">Украшения</button>
+                    <button class="filter-btn" onclick="setType('adventure')">Приключения</button>
+                    <button class="filter-btn" onclick="setType('technical')">Технические</button>
+                    <button class="filter-btn" onclick="setType('magic')">Магия</button>
+                    <button class="filter-btn" onclick="setType('other')">Прочее</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin:2rem 0;">
+            <button class="btn-emerald" onclick="openAddModal()">+ Добавить файл</button>
+        </div>
+
+        <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+
+    <footer class="footer">Emerald Mods — платформа для Minecraft контента</footer>
+
+    <div id="authModal" class="modal"></div>
+    <div id="addModal" class="modal"></div>
+    <div id="detailModal" class="modal"></div>
+
+    <script>
+        const ADMIN_USERNAME = '9nge';
+        const ADMIN_PASSWORD = '56809gghh123';
+        const VERSIONS = ['1.12.2', '1.13.2', '1.14.4', '1.15.2', '1.16.5', '1.17.1', '1.18.2', '1.19.2', '1.19.4', '1.20.1', '1.20.4', '1.21'];
+        const LOADERS = ['Forge', 'Fabric', 'Quilt', 'NeoForge', 'Rift', 'LiteLoader'];
+        const TYPES = ['optimization', 'pvp', 'decoration', 'adventure', 'technical', 'magic', 'other'];
+        
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        let items = JSON.parse(localStorage.getItem('emerald_items')) || [];
+        let users = JSON.parse(localStorage.getItem('emerald_users')) || [];
+        
+        let currentMedia = [];
+        let currentFiles = [];
+        let currentCategory = 'all';
+        let currentType = 'all';
+
+        // Тестовые данные с МУЛЬТИТИПАМИ
+        if (items.length === 0) {
+            items.push({
+                id: '1',
+                name: 'OptiFine',
+                category: 'mod',
+                types: ['optimization', 'pvp'],
+                description: 'Оптимизация игры, поддержка шейдеров и улучшение FPS. Также добавляет зум и динамическое освещение.',
+                versions: ['1.20.1', '1.19.2', '1.18.2'],
+                loaders: ['Forge', 'Fabric'],
+                author: 'system',
+                status: 'approved',
+                date: new Date().toISOString(),
+                downloads: 15234,
+                views: 25123
+            });
+            items.push({
+                id: '2',
+                name: 'Sodium',
+                category: 'mod',
+                types: ['optimization'],
+                description: 'Улучшение производительности и оптимизация рендера',
+                versions: ['1.20.1', '1.19.2'],
+                loaders: ['Fabric'],
+                author: 'system',
+                status: 'approved',
+                date: new Date().toISOString(),
+                downloads: 8732,
+                views: 12431
+            });
+            items.push({
+                id: '3',
+                name: 'Create',
+                category: 'mod',
+                types: ['technical', 'adventure'],
+                description: 'Механизмы, автоматизация и кинетика',
+                versions: ['1.19.2', '1.18.2'],
+                loaders: ['Forge'],
+                author: 'system',
+                status: 'approved',
+                date: new Date().toISOString(),
+                downloads: 5678,
+                views: 8923
+            });
+            items.push({
+                id: '4',
+                name: 'Faithful 64x',
+                category: 'resourcepack',
+                types: ['decoration'],
+                description: 'Классический ресурспак в высоком разрешении',
+                versions: ['1.20.1', '1.19.2'],
+                loaders: [],
+                author: 'system',
+                status: 'approved',
+                date: new Date().toISOString(),
+                downloads: 12345,
+                views: 18234
+            });
+            items.push({
+                id: '5',
+                name: 'One Block',
+                category: 'map',
+                types: ['adventure'],
+                description: 'Выживание на одном блоке',
+                versions: ['1.19.2', '1.18.2'],
+                loaders: [],
+                author: 'system',
+                status: 'approved',
+                date: new Date().toISOString(),
+                downloads: 7890,
+                views: 10234
+            });
+            saveItems();
+        }
+
+        function saveItems() {
+            localStorage.setItem('emerald_items', JSON.stringify(items));
+        }
+
+        function saveUsers() {
+            localStorage.setItem('emerald_users', JSON.stringify(users));
+        }
+
+        function notify(msg, type = 'success') {
+            const n = document.createElement('div');
+            n.className = 'notification';
+            n.textContent = msg;
+            n.style.background = type === 'success' ? '#4caf7a' : '#af4c4c';
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3000);
+        }
+
+        function isAdmin() {
+            return currentUser && currentUser.username === ADMIN_USERNAME;
+        }
+
+        function canEdit(item) {
+            return isAdmin() || (currentUser && item.author === currentUser.username);
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.filter-group:first-child .filter-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === ['all','mod','resourcepack','map'].indexOf(cat));
+            });
+            renderItems();
+        }
+
+        function setType(type) {
+            currentType = type;
+            document.querySelectorAll('.filter-group:last-child .filter-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === ['all','optimization','pvp','decoration','adventure','technical','magic','other'].indexOf(type));
+            });
+            renderItems();
+        }
+
+        function getTypeName(type) {
+            const names = {
+                'optimization': 'Оптимизация',
+                'pvp': 'PvP',
+                'decoration': 'Украшения',
+                'adventure': 'Приключения',
+                'technical': 'Технические',
+                'magic': 'Магия',
+                'other': 'Прочее'
+            };
+            return names[type] || type;
+        }
+
+        function renderItems() {
+            const grid = document.getElementById('cardsGrid');
+            
+            let filtered = items.filter(i => i.status === 'approved');
+            
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(i => i.category === currentCategory);
+            }
+            
+            if (currentType !== 'all') {
+                filtered = filtered.filter(i => i.types && i.types.includes(currentType));
+            }
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:3rem;color:#666;">Ничего не найдено</div>';
+                return;
+            }
+            
+            grid.innerHTML = filtered.map(item => {
+                const editable = canEdit(item);
+                return `
+                    <div class="item-card" onclick="showDetails('${item.id}')">
+                        <div class="card-img">
+                            ${item.media && item.media[0] ? 
+                                `<img src="${item.media[0].url}">` : 
+                                '<span style="opacity:0.3;">📦</span>'
+                            }
+                        </div>
+                        <div class="card-content">
+                            <div class="card-header">
+                                <span class="card-title">${item.name}</span>
+                            </div>
+                            <div class="card-types">
+                                ${item.types ? item.types.map(t => `<span class="card-type">${getTypeName(t)}</span>`).join('') : ''}
+                            </div>
+                            <div class="card-desc">${item.description.substring(0,60)}${item.description.length>60?'...':''}</div>
+                            <div class="card-tags">
+                                ${item.versions.slice(0,2).map(v => `<span class="card-tag">${v}</span>`).join('')}
+                                ${item.loaders && item.loaders.length ? item.loaders.slice(0,2).map(l => `<span class="card-tag">${l}</span>`).join('') : ''}
+                            </div>
+                            <div class="card-footer">
+                                <span>📥 ${item.downloads || 0}</span>
+                                <span>👁️ ${item.views || 0}</span>
+                            </div>
+                            ${editable ? `
+                                <div class="card-actions" onclick="event.stopPropagation()">
+                                    <button class="action-btn" onclick="editItem('${item.id}')">✏️</button>
+                                    <button class="action-btn" onclick="deleteItem('${item.id}')">🗑️</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showDetails(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            
+            item.views = (item.views || 0) + 1;
+            saveItems();
+            
+            const modal = document.getElementById('detailModal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${item.name}</h2>
+                        <span class="close-modal" onclick="closeModal('detailModal')">×</span>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        ${item.media ? item.media.map(m => `
+                            ${m.type.startsWith('image/') ? 
+                                `<img src="${m.url}" style="width:100%;max-height:300px;object-fit:contain;margin-bottom:0.5rem;">` :
+                                `<video src="${m.url}" controls style="width:100%;max-height:300px;margin-bottom:0.5rem;"></video>`
+                            }
+                        `).join('') : ''}
+                    </div>
+                    <p style="margin-bottom:1rem;">${item.description}</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                        <div>
+                            <div style="color:#888;font-size:0.9rem;">Типы</div>
+                            <div>${item.types ? item.types.map(t => getTypeName(t)).join(', ') : ''}</div>
+                        </div>
+                        <div>
+                            <div style="color:#888;font-size:0.9rem;">Версии</div>
+                            <div>${item.versions.join(', ')}</div>
+                        </div>
+                        ${item.loaders && item.loaders.length ? `
+                        <div>
+                            <div style="color:#888;font-size:0.9rem;">Загрузчики</div>
+                            <div>${item.loaders.join(', ')}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <h3 style="color:#4caf7a;margin:1rem 0;">Файлы для скачивания</h3>
+                    ${item.files ? item.files.map(f => `
+                        <div style="background:#1a241a;padding:0.5rem;border-radius:4px;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
+                            <span>${f.version} | ${f.loader}</span>
+                            <a href="${f.url}" target="_blank" style="color:#4caf7a;text-decoration:none;">Скачать</a>
+                        </div>
+                    `).join('') : 'Нет файлов'}
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function updateAdminPanel() {
+            const panel = document.getElementById('adminPanel');
+            if (!panel) return;
+            
+            if (isAdmin()) {
+                panel.classList.add('visible');
+                
+                const pending = items.filter(i => i.status === 'pending');
+                
+                document.getElementById('adminStats').innerHTML = `
+                    <div class="stat-box"><div class="stat-number">${pending.length}</div><div>На проверке</div></div>
+                    <div class="stat-box"><div class="stat-number">${items.length}</div><div>Всего</div></div>
+                    <div class="stat-box"><div class="stat-number">${users.length}</div><div>Юзеров</div></div>
+                `;
+                
+                if (pending.length === 0) {
+                    document.getElementById('pendingList').innerHTML = '<p style="color:#666;text-align:center;">Нет файлов</p>';
+                } else {
+                    document.getElementById('pendingList').innerHTML = pending.map(item => `
+                        <div class="pending-item">
+                            <div class="pending-header">
+                                <span class="pending-title">${item.name}</span>
+                                <span>${item.category}</span>
+                            </div>
+                            <div style="color:#888;font-size:0.85rem;">Автор: ${item.author}</div>
+                            ${item.media ? `
+                                <div class="pending-media">
+                                    ${item.media.slice(0,4).map(m => `
+                                        ${m.type.startsWith('image/') ? 
+                                            `<img src="${m.url}">` : 
+                                            `<video src="${m.url}"></video>`
+                                        }
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                            ${item.files ? `
+                                <div class="pending-files">
+                                    ${item.files.map(f => `
+                                        <div class="pending-file">
+                                            <span>${f.version} | ${f.loader}</span>
+                                            <a href="${f.url}" target="_blank" style="color:#4caf7a;">скачать</a>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                            <div class="pending-actions">
+                                <button class="admin-btn" onclick="approveItem('${item.id}')">✅</button>
+                                <button class="admin-btn admin-btn-danger" onclick="rejectItem('${item.id}')">❌</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                panel.classList.remove('visible');
+            }
+        }
+
+        function approveItem(id) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.status = 'approved';
+                saveItems();
+                updateAdminPanel();
+                renderItems();
+                notify('Одобрено');
+            }
+        }
+
+        function rejectItem(id) {
+            if (confirm('Удалить?')) {
+                items = items.filter(i => i.id !== id);
+                saveItems();
+                updateAdminPanel();
+                renderItems();
+                notify('Удалено');
+            }
+        }
+
+        function deleteItem(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            if (!canEdit(item)) return notify('Нет прав', 'error');
+            if (confirm('Удалить?')) {
+                items = items.filter(i => i.id !== id);
+                saveItems();
+                renderItems();
+                updateAdminPanel();
+                notify('Удалено');
+            }
+        }
+
+        function openAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width:400px;">
+                    <div class="modal-header">
+                        <h2>Вход</h2>
+                        <span class="close-modal" onclick="closeModal('authModal')">×</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Логин</label>
+                        <input type="text" id="loginUsername" placeholder="Введите логин">
+                    </div>
+                    <div class="input-group">
+                        <label>Пароль</label>
+                        <input type="password" id="loginPassword" placeholder="Введите пароль">
+                    </div>
+                    <button class="btn-emerald" style="width:100%;" onclick="handleAuth()">Войти</button>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function handleAuth() {
+            const login = document.getElementById('loginUsername').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            
+            if (login === ADMIN_USERNAME && pass === ADMIN_PASSWORD) {
+                currentUser = { username: ADMIN_USERNAME };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                closeModal('authModal');
+                updateUserInfo();
+                updateAdminPanel();
+                notify('Добро пожаловать, Овнер!');
+            } else {
+                notify('Неверный логин или пароль', 'error');
+            }
+        }
+
+        function updateUserInfo() {
+            const span = document.getElementById('username');
+            const btn = document.getElementById('authBtn');
+            
+            if (currentUser) {
+                span.textContent = currentUser.username;
+                btn.textContent = 'Выйти';
+                btn.onclick = logout;
+            } else {
+                span.textContent = '';
+                btn.textContent = 'Войти';
+                btn.onclick = openAuthModal;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserInfo();
+            updateAdminPanel();
+            notify('Вы вышли');
+        }
+
+        // ИСПРАВЛЕННАЯ функция для выбора чипсов
+        window.toggleChip = function(element) {
+            element.classList.toggle('selected');
+        };
+
+        function handleMedia(files) {
+            if (currentMedia.length + files.length > 10) return notify('Максимум 10', 'error');
+            
+            for (let f of files) {
+                if (f.type.startsWith('image/') || f.type.startsWith('video/')) {
+                    const r = new FileReader();
+                    r.onload = e => {
+                        currentMedia.push({ type: f.type, url: e.target.result });
+                        updateMediaPreview();
+                    };
+                    r.readAsDataURL(f);
+                }
+            }
+        }
+
+        function updateMediaPreview() {
+            const preview = document.getElementById('mediaPreview');
+            if (!preview) return;
+            preview.innerHTML = currentMedia.map((m,i) => `
+                <div class="media-item">
+                    ${m.type.startsWith('image/') ? `<img src="${m.url}">` : `<video src="${m.url}"></video>`}
+                    <button class="remove-media" onclick="removeMedia(${i})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeMedia(i) {
+            currentMedia.splice(i, 1);
+            updateMediaPreview();
+        }
+
+        function addFile() {
+            currentFiles.push({ version: '', loader: '', url: '' });
+            updateFiles();
+        }
+
+        function updateFiles() {
+            const container = document.getElementById('filesContainer');
+            if (!container) return;
+            container.innerHTML = currentFiles.map((f, i) => `
+                <div class="file-item">
+                    <div class="file-row">
+                        <select onchange="updateFile(${i}, 'version', this.value)">
+                            <option value="">Версия</option>
+                            ${VERSIONS.map(v => `<option value="${v}" ${f.version===v?'selected':''}>${v}</option>`).join('')}
+                        </select>
+                        <select onchange="updateFile(${i}, 'loader', this.value)">
+                            <option value="">Загрузчик</option>
+                            ${LOADERS.map(l => `<option value="${l}" ${f.loader===l?'selected':''}>${l}</option>`).join('')}
+                        </select>
+                        <input type="url" placeholder="https://..." value="${f.url}" onchange="updateFile(${i}, 'url', this.value)">
+                        <button class="remove-file" onclick="removeFile(${i})">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateFile(i, field, val) {
+            currentFiles[i][field] = val;
+        }
+
+        function removeFile(i) {
+            currentFiles.splice(i, 1);
+            updateFiles();
+        }
+
+        function getSelectedTypes() {
+            return Array.from(document.querySelectorAll('#typeChips .chip.selected')).map(chip => chip.dataset.type);
+        }
+
+        function updateFormFields() {
+            const category = document.getElementById('itemCategory')?.value;
+            const loaderGroup = document.getElementById('loaderGroup');
+            const typeGroup = document.getElementById('typeGroup');
+            
+            if (!loaderGroup || !typeGroup) return;
+            
+            if (category === 'map') {
+                loaderGroup.classList.add('hidden');
+                typeGroup.classList.add('hidden');
+            } else if (category === 'resourcepack') {
+                loaderGroup.classList.add('hidden');
+                typeGroup.classList.remove('hidden');
+            } else {
+                loaderGroup.classList.remove('hidden');
+                typeGroup.classList.remove('hidden');
+            }
+        }
+
+        function openAddModal() {
+            if (!currentUser) return notify('Сначала войдите', 'error');
+            
+            currentMedia = [];
+            currentFiles = [];
+            
+            const modal = document.getElementById('addModal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Добавить файл</h2>
+                        <span class="close-modal" onclick="closeModal('addModal')">×</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Название</label>
+                        <input type="text" id="itemName" placeholder="Название">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Категория</label>
+                        <select id="itemCategory" onchange="updateFormFields()">
+                            <option value="mod">Мод</option>
+                            <option value="resourcepack">Ресурспак</option>
+                            <option value="map">Карта</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group" id="typeGroup">
+                        <label>Типы (можно выбрать несколько)</label>
+                        <div class="chips-container" id="typeChips">
+                            <span class="chip" data-type="optimization" onclick="toggleChip(this)">Оптимизация</span>
+                            <span class="chip" data-type="pvp" onclick="toggleChip(this)">PvP</span>
+                            <span class="chip" data-type="decoration" onclick="toggleChip(this)">Украшения</span>
+                            <span class="chip" data-type="adventure" onclick="toggleChip(this)">Приключения</span>
+                            <span class="chip" data-type="technical" onclick="toggleChip(this)">Технические</span>
+                            <span class="chip" data-type="magic" onclick="toggleChip(this)">Магия</span>
+                            <span class="chip" data-type="other" onclick="toggleChip(this)">Прочее</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Описание</label>
+                        <textarea id="itemDescription" rows="3" placeholder="Описание"></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Медиа (до 10 фото/видео)</label>
+                        <div class="media-upload-area" onclick="document.getElementById('mediaInput').click()">
+                            <input type="file" id="mediaInput" multiple accept="image/*,video/*" style="display:none;" onchange="handleMedia(this.files)">
+                            <span>+ Загрузить</span>
+                        </div>
+                        <div id="mediaPreview" class="media-preview"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Версии Minecraft</label>
+                        <div class="chips-container" id="versionChips">
+                            ${VERSIONS.map(v => `<span class="chip" onclick="toggleChip(this)">${v}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="input-group" id="loaderGroup">
+                        <label>Загрузчики</label>
+                        <div class="chips-container" id="loaderChips">
+                            ${LOADERS.map(l => `<span class="chip" onclick="toggleChip(this)">${l}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Файлы для скачивания</label>
+                        <div id="filesContainer"></div>
+                        <button class="add-file-btn" onclick="addFile()">+ Добавить файл</button>
+                    </div>
+                    
+                    <button class="btn-emerald" style="width:100%;margin-top:1rem;" onclick="submitAdd()">Отправить</button>
+                </div>
+            `;
+            
+            updateFormFields();
+            modal.style.display = 'flex';
+        }
+
+        function submitAdd() {
+            const versions = Array.from(document.querySelectorAll('#versionChips .chip.selected')).map(el => el.textContent);
+            const loaders = Array.from(document.querySelectorAll('#loaderChips .chip.selected')).map(el => el.textContent);
+            const types = getSelectedTypes();
+            const category = document.getElementById('itemCategory').value;
+            
+            if (versions.length === 0) return notify('Выберите версии', 'error');
+            
+            if (category === 'mod' && loaders.length === 0) return notify('Выберите загрузчики', 'error');
+            
+            if (category !== 'map' && types.length === 0) return notify('Выберите типы', 'error');
+            
+            const validFiles = currentFiles.filter(f => f.version && f.loader && f.url);
+            
+            const newItem = {
+                id: Date.now().toString(),
+                name: document.getElementById('itemName').value,
+                category: category,
+                types: types,
+                description: document.getElementById('itemDescription').value,
+                versions,
+                loaders,
+                media: currentMedia,
+                files: validFiles,
+                author: currentUser.username,
+                status: 'pending',
+                date: new Date().toISOString(),
+                downloads: 0,
+                views: 0
+            };
+            
+            items.push(newItem);
+            saveItems();
+            closeModal('addModal');
+            updateAdminPanel();
+            notify('Отправлено на проверку');
+        }
+
+        function editItem(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            if (!canEdit(item)) return notify('Нет прав', 'error');
+            
+            currentMedia = item.media || [];
+            currentFiles = item.files || [];
+            
+            const modal = document.getElementById('addModal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Редактировать</h2>
+                        <span class="close-modal" onclick="closeModal('addModal')">×</span>
+                    </div>
+                    
+                    <input type="hidden" id="editId" value="${item.id}">
+                    
+                    <div class="input-group">
+                        <label>Название</label>
+                        <input type="text" id="itemName" value="${item.name}">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Категория</label>
+                        <select id="itemCategory" onchange="updateFormFields()">
+                            <option value="mod" ${item.category==='mod'?'selected':''}>Мод</option>
+                            <option value="resourcepack" ${item.category==='resourcepack'?'selected':''}>Ресурспак</option>
+                            <option value="map" ${item.category==='map'?'selected':''}>Карта</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group" id="typeGroup" ${item.category==='map'?'style="display:none;"':''}>
+                        <label>Типы (можно выбрать несколько)</label>
+                        <div class="chips-container" id="typeChips">
+                            <span class="chip" data-type="optimization" onclick="toggleChip(this)">Оптимизация</span>
+                            <span class="chip" data-type="pvp" onclick="toggleChip(this)">PvP</span>
+                            <span class="chip" data-type="decoration" onclick="toggleChip(this)">Украшения</span>
+                            <span class="chip" data-type="adventure" onclick="toggleChip(this)">Приключения</span>
+                            <span class="chip" data-type="technical" onclick="toggleChip(this)">Технические</span>
+                            <span class="chip" data-type="magic" onclick="toggleChip(this)">Магия</span>
+                            <span class="chip" data-type="other" onclick="toggleChip(this)">Прочее</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Описание</label>
+                        <textarea id="itemDescription" rows="3">${item.description}</textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Медиа (до 10 фото/видео)</label>
+                        <div class="media-upload-area" onclick="document.getElementById('mediaInput').click()">
+                            <input type="file" id="mediaInput" multiple accept="image/*,video/*" style="display:none;" onchange="handleMedia(this.files)">
+                            <span>+ Загрузить</span>
+                        </div>
+                        <div id="mediaPreview" class="media-preview"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Версии Minecraft</label>
+                        <div class="chips-container" id="versionChips">
+                            ${VERSIONS.map(v => `<span class="chip ${item.versions.includes(v) ? 'selected' : ''}" onclick="toggleChip(this)">${v}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="input-group" id="loaderGroup" ${item.category==='map'||item.category==='resourcepack'?'style="display:none;"':''}>
+                        <label>Загрузчики</label>
+                        <div class="chips-container" id="loaderChips">
+                            ${LOADERS.map(l => `<span class="chip ${item.loaders.includes(l) ? 'selected' : ''}" onclick="toggleChip(this)">${l}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Файлы для скачивания</label>
+                        <div id="filesContainer"></div>
+                        <button class="add-file-btn" onclick="addFile()">+ Добавить файл</button>
+                    </div>
+                    
+                    <button class="btn-emerald" style="width:100%;margin-top:1rem;" onclick="submitEdit()">Сохранить</button>
+                </div>
+            `;
+            
+            // Отмечаем выбранные типы
+            setTimeout(() => {
+                if (item.types) {
+                    document.querySelectorAll('#typeChips .chip').forEach(chip => {
+                        if (item.types.includes(chip.dataset.type)) {
+                            chip.classList.add('selected');
+                        }
+                    });
+                }
+            }, 100);
+            
+            updateMediaPreview();
+            updateFiles();
+            updateFormFields();
+            modal.style.display = 'flex';
+        }
+
+        function submitEdit() {
+            const id = document.getElementById('editId').value;
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            
+            const versions = Array.from(document.querySelectorAll('#versionChips .chip.selected')).map(el => el.textContent);
+            const loaders = Array.from(document.querySelectorAll('#loaderChips .chip.selected')).map(el => el.textContent);
+            const types = getSelectedTypes();
+            const category = document.getElementById('itemCategory').value;
+            const validFiles = currentFiles.filter(f => f.version && f.loader && f.url);
+            
+            Object.assign(item, {
+                name: document.getElementById('itemName').value,
+                category: category,
+                types: types,
+                description: document.getElementById('itemDescription').value,
+                versions,
+                loaders,
+                media: currentMedia,
+                files: validFiles,
+                status: isAdmin() ? 'approved' : 'pending'
+            });
+            
+            saveItems();
+            closeModal('addModal');
+            updateAdminPanel();
+            renderItems();
+            notify('Сохранено');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function showMainPage() {
+            setCategory('all');
+            setType('all');
+        }
+
+        renderItems();
+        updateUserInfo();
+        updateAdminPanel();
+    </script>
+</body>
+</html>
